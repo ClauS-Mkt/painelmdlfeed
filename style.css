@@ -1,0 +1,102 @@
+/* site inteiro travado */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 248px;
+  height: 448px;
+  overflow: hidden;
+  background: #123955;
+}
+
+/* container fixo */
+#app {
+  width: 248px;
+  height: 448px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* palco (448 - 48 = 400px) */
+#stage {
+  position: relative;
+  width: 248px;
+  height: 400px;
+  overflow: hidden;
+}
+
+/* trilho animado (COLUNA – ESSENCIAL) */
+#track {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  transform: translateX(-50%) translateY(0);
+  will-change: transform;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 248px;
+}
+
+/* ativa animação */
+#track.run {
+  animation: subir var(--scroll-duration, 10s) linear infinite;
+}
+
+/* loop infinito subindo */
+@keyframes subir {
+  from {
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    transform: translateX(-50%)
+      translateY(calc(-1 * var(--scroll-distance, 0px)));
+  }
+}
+
+/* POLAROID: 200 x 230 */
+
+.polaroid {
+  width: 200px;
+  height: 230px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  position: relative;
+  box-sizing: border-box;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.polaroid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+  position: static;
+}
+
+/* rodapé info */
+#info {
+  width: 248px;
+  height: 48px;
+  background: #0d2c37;
+  color: #00ff88;
+
+  font-family: monospace;
+  font-size: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+  box-sizing: border-box;
+  text-align: center;
+}

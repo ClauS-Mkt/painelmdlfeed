@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Painel de Fotos</title>
+  <meta name="viewport" content="width=248, height=448, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <div id="track"></div>
+    </div>
+    <div id="info">carregando feed…</div>
+  </div>
+
+  <script>
+    const FEED_URL = "http://192.168.1.37:3000/feed.json"; // URL para o feed
+    const INTERVALO_MS = 30000;
+
+    // métricas do seu layout
+    const POLAROID_H = 230;
+    const GAP = 40;
+    const STEP = POLAROID_H + GAP;
+
+    // velocidade do loop (px por segundo). Aumente para ficar mais rápido.
+    const SPEED_PX_PER_SEC = 90;
+
+    function ordenarPorDataAsc(items) {
+      return items.slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    }
+
+    function criarPolaroid(item) {
+      const p = document.createElement("div");
+      p.className = "polaroid";
+
+      // ...existing code...
+      const img = document.createElement("img");
+      img.src = item.url.startsWith('http') ? item.url : "http://192.168.1.37:3000" + item.url;
+      img.alt = item.caption || "foto";
+      p.appendChild(img);
+
+      return p;
+    }
+
+    function setInfo(txt) {
+      document.getElementById("info").textContent = txt;
+    }
+
+    function montarLoop(items) {
+      const track = document.getElementById("track");
+      track.innerHTML = "";
+
+      if (!items || items.length === 0) {
+        setInfo("nenhuma imagem no feed");
+        return;
+      }
+
+      const ordered = ordenarPorDataAsc(items);
+      const ultima = ordered[ordered.length - 1];
+      setInfo(new Date(ultima.createdAt).toLocaleString("pt-BR"));
+
+      const frag1 = document.createDocumentFragment();
+      for (const it of ordered) frag1.appendChild(criarPolaroid(it));
+      track.appendChild(frag1);
+
+      const frag2 = document.createDocumentFragment();
+      for (const it of ordered) frag2.appendChild(criarPolaroid(it));
+      track.appendChild(frag2);
+
+      const distance = STEP * ordered.length;
+      track.style.setProperty("--scroll-distance", `${distance}px`);
+
+      const durationSec = distance / SPEED_PX_PER_SEC;
+      track.style.setProperty("--scroll-duration", `${durationSec}s`);
+
+      track.classList.remove("run");
+      void track.offsetHeight;
+      track.classList.add("run");
+    }
+
+    async function carregarFeed() {
+      try {
+        const res = await fetch(FEED_URL, {
+          cache: "no-store",
+          headers: {
+            // ...existing code...
+          }
+        });
+        const feed = await res.json();
+        montarLoop(feed.items || []);
+      } catch (e) {
+        setInfo("erro ao carregar feed");
+      }
+    }
+
+    carregarFeed();
+    setInterval(carregarFeed, INTERVALO_MS);
+  </script>
+</body>
+</html>
