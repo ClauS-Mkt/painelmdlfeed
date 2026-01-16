@@ -15,7 +15,7 @@
   </div>
 
   <script>
-    const FEED_URL = "http://192.168.1.37:3000/feed.json"; // URL para o feed
+    const FEED_URL = "http://192.168.1.37:4000/feed.json"; // URL para o feed
     const INTERVALO_MS = 30000;
 
     // métricas do seu layout
@@ -35,7 +35,7 @@
       p.className = "polaroid";
 
       const img = document.createElement("img");
-      img.src = item.url.startsWith('http') ? item.url : "http://192.168.1.37:3000" + item.url;
+      img.src = item.url.startsWith('http') ? item.url : "http://192.168.1.37:4000" + item.url;
       img.alt = item.caption || "foto";
       p.appendChild(img);
 
@@ -102,4 +102,5 @@
   </script>
 </body>
 </html>
+
 
