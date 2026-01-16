@@ -11,7 +11,7 @@
     <div id="stage">
       <div id="track"></div>
     </div>
-    <div id="info">carregando feed…</div>
+    <div id="info">Escaneie o QR.Code e compartilhe sua frase</div>
   </div>
 
   <script>
@@ -26,15 +26,14 @@
     // velocidade do loop (px por segundo). Aumente para ficar mais rápido.
     const SPEED_PX_PER_SEC = 90;
 
-    function ordenarPorDataAsc(items) {
-      return items.slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    function ordenarPorDataDesc(items) {
+      return items.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     function criarPolaroid(item) {
       const p = document.createElement("div");
       p.className = "polaroid";
 
-      // ...existing code...
       const img = document.createElement("img");
       img.src = item.url.startsWith('http') ? item.url : "http://192.168.1.37:3000" + item.url;
       img.alt = item.caption || "foto";
@@ -49,43 +48,45 @@
 
     function montarLoop(items) {
       const track = document.getElementById("track");
-      track.innerHTML = "";
 
+      // Se não houverem imagens, exibe a mensagem
       if (!items || items.length === 0) {
         setInfo("nenhuma imagem no feed");
         return;
       }
 
-      const ordered = ordenarPorDataAsc(items);
-      const ultima = ordered[ordered.length - 1];
-      setInfo(new Date(ultima.createdAt).toLocaleString("pt-BR"));
+      // Ordena do mais recente para o mais antigo
+      let ordered = ordenarPorDataDesc(items);
 
-      const frag1 = document.createDocumentFragment();
-      for (const it of ordered) frag1.appendChild(criarPolaroid(it));
-      track.appendChild(frag1);
+      // Remove imagens antigas (para evitar duplicações)
+      track.innerHTML = "";
 
-      const frag2 = document.createDocumentFragment();
-      for (const it of ordered) frag2.appendChild(criarPolaroid(it));
-      track.appendChild(frag2);
+      // Adiciona as fotos duas vezes para garantir o loop contínuo
+      for (let i = 0; i < 2; i++) {
+        for (const it of ordered) {
+          track.appendChild(criarPolaroid(it));
+        }
+      }
 
-      const distance = STEP * ordered.length;
+      // Ajusta a distância para o número total de polaroids renderizadas
+      const totalPolaroids = track.childElementCount;
+      const distance = STEP * totalPolaroids;
       track.style.setProperty("--scroll-distance", `${distance}px`);
 
+      // Calcula a duração da animação baseada na distância e na velocidade
       const durationSec = distance / SPEED_PX_PER_SEC;
       track.style.setProperty("--scroll-duration", `${durationSec}s`);
 
+      // Reinicia a animação para garantir que o loop funcione de forma contínua
       track.classList.remove("run");
-      void track.offsetHeight;
+      void track.offsetHeight;  // Força um reflow para reiniciar a animação
       track.classList.add("run");
     }
 
     async function carregarFeed() {
       try {
         const res = await fetch(FEED_URL, {
-          cache: "no-store",
-          headers: {
-            // ...existing code...
-          }
+          cache: "no-store"
         });
         const feed = await res.json();
         montarLoop(feed.items || []);
@@ -94,7 +95,9 @@
       }
     }
 
+    // Carrega o feed assim que a página é carregada
     carregarFeed();
+    // Recarrega o feed a cada 30 segundos
     setInterval(carregarFeed, INTERVALO_MS);
   </script>
 </body>
