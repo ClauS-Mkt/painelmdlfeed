@@ -1,3 +1,13 @@
+/* Efeito de destaque no centro do stage */
+.polaroid {
+  transition: transform 0.45s cubic-bezier(.22,0,.18,1), box-shadow 0.45s cubic-bezier(.22,0,.18,1);
+}
+
+.polaroid.center {
+  z-index: 2;
+  transform: scale(1.13);
+  box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.30), 0 4px 16px rgba(0,0,0,0.13);
+}
 /* site inteiro travado */
 html, body {
   margin: 0;
@@ -5,7 +15,7 @@ html, body {
   width: 248px;
   height: 448px;
   overflow: hidden;
-  background: #123955;
+  background: linear-gradient(135deg, #0a1833 0%, #1976d2 100%);
 }
 
 /* container fixo */
@@ -16,11 +26,11 @@ html, body {
   flex-direction: column;
 }
 
-/* palco (448 - 48 = 400px) */
+/* palco ocupa toda a altura */
 #stage {
   position: relative;
   width: 248px;
-  height: 400px;
+  height: 448px;
   overflow: hidden;
 }
 
@@ -63,7 +73,7 @@ html, body {
   height: 230px;
   background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  box-shadow: 0 18px 48px 0 rgba(13, 71, 161, 0.35), 0 8px 32px rgba(0,0,0,0.22);
   position: relative;
   box-sizing: border-box;
   margin-bottom: 40px;
@@ -82,21 +92,4 @@ html, body {
   position: static;
 }
 
-/* rodapé info */
-#info {
-  width: 248px;
-  height: 48px;
-  background: #0d2c37;
-  color: #00ff88;
 
-  font-family: monospace;
-  font-size: 12px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0 8px;
-  box-sizing: border-box;
-  text-align: center;
-}
