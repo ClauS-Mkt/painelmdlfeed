@@ -71,64 +71,37 @@
 
       // Ajusta a distância para o número total de polaroids renderizadas
       const totalPolaroids = track.childElementCount;
+      const offset = 0;
       const distance = STEP * totalPolaroids;
       track.style.setProperty("--scroll-distance", `${distance}px`);
+      track.style.setProperty("--scroll-offset", `${offset}px`);
 
       // Calcula a duração da animação baseada na distância e na velocidade
       const durationSec = distance / SPEED_PX_PER_SEC;
       track.style.setProperty("--scroll-duration", `${durationSec}s`);
 
-      // Inicia a animação infinita (sem reiniciar)
-      track.classList.add("run");
-
-      // Inicia o efeito de destaque quando a polaroid estiver totalmente visível
-      startFullVisibleEffect(track);
-    }
-
-    // Função para destacar a polaroid quando ela estiver totalmente visível no stage
-    function startFullVisibleEffect(track) {
-      // Armazena o tempo em que cada polaroid ficou totalmente visível
-      const visibleSince = new Map();
-      const DELAY_MS = 200; // tempo mínimo totalmente visível para crescer
-
-      function highlight() {
-        const stage = document.getElementById("stage");
-        const stageRect = stage.getBoundingClientRect();
-        let bestPolaroid = null;
-        let maxVisible = 0;
-        const now = Date.now();
-        for (const p of track.children) {
-          const rect = p.getBoundingClientRect();
-          // Calcular a parte visível da polaroid dentro do stage
-          const visibleTop = Math.max(rect.top, stageRect.top);
-          const visibleBottom = Math.min(rect.bottom, stageRect.bottom);
-          const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-          const percentVisible = visibleHeight / rect.height;
-          if (percentVisible > maxVisible) {
-            maxVisible = percentVisible;
-            bestPolaroid = p;
-          }
-          // Controle de tempo de visibilidade
-          if (percentVisible > 0.99) {
-            if (!visibleSince.has(p)) visibleSince.set(p, now);
-          } else {
-            visibleSince.delete(p);
-          }
-        }
-        // Remove destaque de todas
-        for (const p of track.children) {
-          p.classList.remove("center");
-        }
-        // Destaca a mais visível se estiver pelo menos 99% visível por tempo suficiente
-        if (bestPolaroid && maxVisible > 0.99 && visibleSince.has(bestPolaroid)) {
-          if (now - visibleSince.get(bestPolaroid) > DELAY_MS) {
-            bestPolaroid.classList.add("center");
-          }
-        }
-        requestAnimationFrame(highlight);
+      // --- Persistência do progresso do looping ---
+      // Recupera o tempo de início salvo ou define agora
+      let startTimestamp = localStorage.getItem("loopStartTimestamp");
+      const now = Date.now();
+      if (!startTimestamp) {
+        startTimestamp = now;
+        localStorage.setItem("loopStartTimestamp", startTimestamp);
       }
-      requestAnimationFrame(highlight);
+      // Calcula o tempo já decorrido
+      const elapsed = (now - startTimestamp) / 1000; // em segundos
+      // Calcula o percentual já percorrido
+      const percent = (elapsed % durationSec) / durationSec;
+      // Calcula o deslocamento inicial
+      const initialOffset = percent * distance;
+
+      // Aplica o deslocamento inicial via animação customizada
+      track.style.animation = `subir var(--scroll-duration, 10s) linear infinite`;
+      track.style.animationDelay = `-${percent * durationSec}s`;
+      track.classList.add("run");
     }
+
+    // Removida a função de destaque para animação de escala
 
     async function carregarFeed() {
       try {
@@ -149,5 +122,3 @@
   </script>
 </body>
 </html>
-
-
