@@ -1,13 +1,7 @@
 /* Efeito de destaque no centro do stage */
-.polaroid {
-  transition: transform 0.45s cubic-bezier(.22,0,.18,1), box-shadow 0.45s cubic-bezier(.22,0,.18,1);
-}
 
-.polaroid.center {
-  z-index: 2;
-  transform: scale(1.13);
-  box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.30), 0 4px 16px rgba(0,0,0,0.13);
-}
+
+
 /* site inteiro travado */
 html, body {
   margin: 0;
@@ -58,7 +52,8 @@ html, body {
 /* loop infinito subindo */
 @keyframes subir {
   from {
-    transform: translateX(-50%) translateY(0);
+    /* Começa com metade do GAP + metade da polaroid para alinhar a primeira foto no topo */
+    transform: translateX(-50%) translateY(calc(-1 * (0px)));
   }
   to {
     transform: translateX(-50%)
